@@ -1,5 +1,5 @@
 #自動生成ファイル
-*.csv
+data/results/*.csv
 *.txt
 
 # Python

@@ -1,0 +1,11 @@
+#自動生成ファイル
+*.csv
+*.txt
+
+# Python
+__pycache__/
+*.pyc
+
+#仮想環境
+venv/
+.venv/

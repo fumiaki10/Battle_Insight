@@ -8,12 +8,13 @@ import re #文字列の検索や特定パターンの抜出を行える  ダメ�
 # print(result)                        ⇒　['6443']
 import os
 import glob
+import shutil
 
 
 INPUT_FILES = "data/raw/*.txt"
 OUTPUT_FILE = "data/results/my_result.csv"
 MY_NAME = "ローブ"
-
+PROCESSED_DIR = "data/processed"
 
 
 # プレイヤーかどうかを判定する
@@ -45,7 +46,8 @@ def clean_name(line):
 players = []
 
 # INPUT_FILEの中身*txtを全部探してinput_txtにいれる
-for input_file in glob.glob(INPUT_FILES):
+input_files = glob.glob(INPUT_FILES)
+for input_file in input_files:
    
 
   with open(input_file, "r", encoding="utf-8")as f:
@@ -113,6 +115,11 @@ with open(OUTPUT_FILE, "a", encoding="utf-8-sig", newline="") as f:
    if not header_exists:
     writer.writeheader()
    writer.writerows(players)
+
+os.makedirs(PROCESSED_DIR, exist_ok=True)
+
+for input_file in input_files:
+   shutil.move(input_file, PROCESSED_DIR)
 
 print(f"{len(players)}人分を抽出しました")
 print(f"{OUTPUT_FILE}に保存しました")

@@ -11,7 +11,7 @@ import glob
 import shutil
 
 
-INPUT_FILES = "data/raw/*.txt"
+INPUT_FILES = "data/raw/*/*.txt"
 OUTPUT_FILE = "data/results/my_result.csv"
 MY_NAME = "ローブ"
 PROCESSED_DIR = "data/processed"
@@ -50,6 +50,8 @@ input_files = glob.glob(INPUT_FILES)
 for input_file in input_files:
 
   match_id = os.path.splitext(os.path.basename(input_file))[0]
+
+  character_name = os.path.basename(os.path.dirname(input_file))
    
 
   with open(input_file, "r", encoding="utf-8")as f:
@@ -78,9 +80,11 @@ for input_file in input_files:
         # 6443みたいになっているので順番で取っている
         damage = lines[i + 1]
         kd = lines[i + 2]
+        k, d = kd.split("/")
         support = lines[i + 3]
         ally_kill = lines[i + 4]
         lock_time = lines[i + 5]
+        lock_time_value = lock_time.replace("%", "")
         burst_kill = lines[i + 6]
 
         if(
@@ -97,17 +101,21 @@ for input_file in input_files:
             players.append({
               "試合ID": match_id,
               "勝敗": result,
+              "使用キャラ": character_name,
               "プレイヤー名": name,
               "ダメージ": damage,
               "K/D": kd,
+
+              "K": k,
+              "D": d,
               "支援": support,
               "味方撃破": ally_kill,
-              "被ロック": lock_time,
+              "被ロック": lock_time_value,
               "バースト撃破": burst_kill,
           })
 
 
-fieldnames=["試合ID","勝敗","プレイヤー名", "ダメージ", "K/D", "支援", "味方撃破", "被ロック", "バースト撃破"]
+fieldnames=["試合ID","勝敗","使用キャラ","プレイヤー名", "ダメージ", "K/D","K","D", "支援", "味方撃破", "被ロック", "バースト撃破"]
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 

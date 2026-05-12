@@ -7,6 +7,7 @@ pytesseract.pytesseract.tesseract_cmd = (
   r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 )
 
+
 #imageに画像データとして、メモリに変換した相対パスのtest.pngを格納
 image = Image.open("test.png")
 
@@ -17,17 +18,6 @@ cropped = image.crop((0, 200, 1200, 900))
 damage_area = image.crop((650,250,950,920))
 
 damage_area.save("damage_test.png")
-
-#グレースケール化
-gray = cropped.convert("L")
-
-# 横、縦幅2倍にする
-big = gray.resize((gray.width * 2, gray.height * 2))
-
-#中間色を消す　白黒をはっきりさせる
-bw = big.point(lambda x: 0 if x < 160 else 255)
-
-bw.save("processed.png")
 
 #imageをstring型、日本語にしてocrにする
 text = pytesseract.image_to_string(
@@ -50,4 +40,93 @@ kd_text = pytesseract.image_to_string(
   config="--psm 6 -c tessedit_char_whitelist=0123456789/"
 )
 
-print(kd_text)
+#支援を取りに行く
+support_area = image.crop((1100,250,1250,920))
+
+support_gray = support_area.convert("L")
+support_big = support_gray.resize((support_gray.width * 3, support_gray.height * 3))
+support_bw = support_big.point(lambda x: 0 if x < 180 else 255)
+
+support_bw.save("support_test.png")
+
+support_text = pytesseract.image_to_string(
+  support_bw,
+  lang="eng",
+  config="--psm 6 -c tessedit_char_whitelist=0123456789"
+)
+
+#味方撃破を取りに行く
+ally_kill_area = image.crop((1250,250,1400,920))
+
+ally_kill_gray = ally_kill_area.convert("L")
+ally_kill_big = ally_kill_gray.resize((ally_kill_gray.width * 3, ally_kill_gray.height * 3))
+ally_kill_bw = ally_kill_big.point(lambda x: 0 if x < 180 else 255)
+
+ally_kill_bw.save("ally_kill_test.png")
+
+ally_kill_text = pytesseract.image_to_string(
+  ally_kill_bw,
+  lang="eng",
+  config="--psm 6 -c tessedit_char_whitelist=0123456789"
+)
+
+#被ロック時間を取りに行く
+lock_time_area = image.crop((1370,250,1630,920))
+
+lock_time_gray = lock_time_area.convert("L")
+lock_time_big = lock_time_gray.resize((lock_time_gray.width * 3, lock_time_gray.height * 3))
+lock_time_bw = lock_time_big.point(lambda x: 0 if x < 180 else 255)
+
+lock_time_bw.save("lock_time_test.png")
+
+lock_time_text = pytesseract.image_to_string(
+  lock_time_bw,
+  lang="eng",
+  config="--psm 6 -c tessedit_char_whitelist=0123456789%"
+)
+
+
+#バースト中の撃破を取りに行く
+burst_kill_area = image.crop((1620,250,1750,920))
+
+burst_kill_gray = burst_kill_area.convert("L")
+burst_kill_big = burst_kill_gray.resize((burst_kill_gray.width * 3, burst_kill_gray.height * 3))
+burst_kill_bw = burst_kill_big.point(lambda x: 0 if x < 180 else 255)
+
+burst_kill_bw.save("burst_kill_test.png")
+
+burst_kill_text = pytesseract.image_to_string(
+  burst_kill_bw,
+  lang="eng",
+  config="--psm 6 -c tessedit_char_whitelist=0123456789"
+)
+
+#上記で切り取った部分を格納⇒整理する
+def to_list(text):
+  return[line.strip() for line in text.splitlines() if line.strip()]
+
+damage_list = to_list(text)
+kd_list = to_list(kd_text)
+support_list = to_list(support_text)
+ally_kill_list = to_list(ally_kill_text)
+lock_time_list = to_list(lock_time_text)
+burst_kill_list = to_list(burst_kill_text)
+
+name = ["ローブ","player2","player3","player4"]
+
+output_lines = []
+
+for i in range(4):
+  output_lines.append(name[i])
+  output_lines.append(damage_list[i])
+  output_lines.append(kd_list[i])
+  output_lines.append(support_list[i])
+  output_lines.append(ally_kill_list[i])
+  output_lines.append(lock_time_list[i])
+  output_lines.append(burst_kill_list[i])
+
+with open("data/raw/ローブ/test.txt", "w", encoding="utf-8")as f:
+  f.write("\n".join(output_lines))
+
+print("txtを作成しました")
+# print(burst_kill_text)

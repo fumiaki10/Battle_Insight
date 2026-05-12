@@ -1,6 +1,7 @@
 #自動生成ファイル
 data/results/*.csv
 *.txt
+*.png
 
 # Python
 __pycache__/

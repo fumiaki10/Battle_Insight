@@ -11,7 +11,7 @@ import glob
 import shutil
 
 
-INPUT_FILES = "data/raw/*.txt"
+INPUT_FILES = "data/raw/*/*.txt"
 OUTPUT_FILE = "data/results/my_result.csv"
 MY_NAME = "ローブ"
 PROCESSED_DIR = "data/processed"
@@ -48,27 +48,43 @@ players = []
 # INPUT_FILEの中身*txtを全部探してinput_txtにいれる
 input_files = glob.glob(INPUT_FILES)
 for input_file in input_files:
+
+  match_id = os.path.splitext(os.path.basename(input_file))[0]
+
+  character_name = os.path.basename(os.path.dirname(input_file))
    
 
   with open(input_file, "r", encoding="utf-8")as f:
           # line.strip()したものを⇒forで回す⇒if line.strip()を満たしていたら追加
           lines = [line.strip() for line in f if line.strip()]
 
+          text = "\n".join(lines)
+
+          result = ""
+
+          if "戦闘勝" in text:
+             result = "勝"
+          elif "戦闘失" in text:
+             result = "負"
+
 # enumerate使うと番号も振れる　i=1 name=ローブみたいに取り出したものに番号が振れる
   for i, line in enumerate(lines):
+    if "▶" in line:
   #  ▶もMVPも描いてない名前を上で作っているのでそれを持ってきて
-    name = clean_name(line)
+      name = clean_name(line)
 
-    if i + 6 < len(lines):
+      if i + 6 < len(lines):
         # 振られた番号をもとに次の行を見れるようにする
         # ocrの結果が縦に行で並んでいるから
         # ローブ
         # 6443みたいになっているので順番で取っている
         damage = lines[i + 1]
         kd = lines[i + 2]
+        k, d = kd.split("/")
         support = lines[i + 3]
         ally_kill = lines[i + 4]
         lock_time = lines[i + 5]
+        lock_time_value = lock_time.replace("%", "")
         burst_kill = lines[i + 6]
 
         if(
@@ -83,17 +99,25 @@ for input_file in input_files:
           if name == MY_NAME:
               
             players.append({
+              "試合ID": match_id,
+              "勝敗": result,
+              "使用キャラ": character_name,
               "プレイヤー名": name,
               "ダメージ": damage,
               "K/D": kd,
+
+              "K": k,
+              "D": d,
               "支援": support,
               "味方撃破": ally_kill,
-              "被ロック": lock_time,
+              "被ロック": lock_time_value,
               "バースト撃破": burst_kill,
           })
 
 
-fieldnames=["プレイヤー名", "ダメージ", "K/D", "支援", "味方撃破", "被ロック", "バースト撃破"]
+fieldnames=["試合ID","勝敗","使用キャラ","プレイヤー名", "ダメージ", "K/D","K","D", "支援", "味方撃破", "被ロック", "バースト撃破"]
+
+os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
 expected_header = ",".join(fieldnames)
 
@@ -121,5 +145,5 @@ os.makedirs(PROCESSED_DIR, exist_ok=True)
 for input_file in input_files:
    shutil.move(input_file, PROCESSED_DIR)
 
-print(f"{len(players)}人分を抽出しました")
+print(f"{len(players)}試合分を抽出しました")
 print(f"{OUTPUT_FILE}に保存しました")

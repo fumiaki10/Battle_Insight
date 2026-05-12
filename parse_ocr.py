@@ -69,7 +69,7 @@ for input_file in input_files:
 
 # enumerate使うと番号も振れる　i=1 name=ローブみたいに取り出したものに番号が振れる
   for i, line in enumerate(lines):
-    if "▶" in line:
+    if is_player_start(line):
   #  ▶もMVPも描いてない名前を上で作っているのでそれを持ってきて
       name = clean_name(line)
 

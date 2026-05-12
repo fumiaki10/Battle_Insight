@@ -112,6 +112,7 @@ ally_kill_list = to_list(ally_kill_text)
 lock_time_list = to_list(lock_time_text)
 burst_kill_list = to_list(burst_kill_text)
 
+# 上手くとれていないので手打ち
 name = ["ローブ","player2","player3","player4"]
 
 output_lines = []

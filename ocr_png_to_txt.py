@@ -17,6 +17,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 image_files = glob.glob(INPUT_IMAGES)
 
+def to_list(text):
+  return[line.strip() for line in text.splitlines() if line.strip()]
+
 for image_file in image_files:
   image = Image.open(image_file)
 
@@ -28,7 +31,7 @@ for image_file in image_files:
   cropped = image.crop((0, 200, 1200, 900))
 
   #ダメージ列を取る
-  damage_area = image.crop((650,250,950,920))
+  damage_area = image.crop((730,250,950,920))
 
   damage_area.save("damage_test.png")
 
@@ -54,7 +57,7 @@ for image_file in image_files:
   )
 
   #支援を取りに行く
-  support_area = image.crop((1100,250,1250,920))
+  support_area = image.crop((1070,250,1280,950))
 
   support_gray = support_area.convert("L")
   support_big = support_gray.resize((support_gray.width * 3, support_gray.height * 3))
@@ -115,8 +118,7 @@ for image_file in image_files:
   )
 
   #上記で切り取った部分を格納⇒整理する
-  def to_list(text):
-    return[line.strip() for line in text.splitlines() if line.strip()]
+ 
 
   damage_list = to_list(text)
   kd_list = to_list(kd_text)
@@ -129,7 +131,7 @@ for image_file in image_files:
   name = ["ローブ","player2","player3","player4"]
 
   output_lines = []
-
+  
   player_count = min(
     len(damage_list),
     len(kd_list),
@@ -141,7 +143,6 @@ for image_file in image_files:
 
   for i in range(player_count):
 
-  # for i in range(4):
     output_lines.append(name[i])
     output_lines.append(damage_list[i])
     output_lines.append(kd_list[i])
